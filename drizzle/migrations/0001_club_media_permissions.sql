@@ -1,0 +1,3 @@
+CREATE POLICY staff_media_read ON storage.objects FOR SELECT TO authenticated USING(bucket_id='club-media' AND EXISTS(SELECT 1 FROM public.user_roles WHERE user_id=auth.uid()));
+CREATE POLICY staff_media_upload ON storage.objects FOR INSERT TO authenticated WITH CHECK(bucket_id='club-media' AND (public.can_manage_club('gallery') OR public.can_manage_club('players')));
+CREATE POLICY staff_media_delete ON storage.objects FOR DELETE TO authenticated USING(bucket_id='club-media' AND (public.can_manage_club('gallery') OR public.can_manage_club('players')));

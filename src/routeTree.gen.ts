@@ -10,33 +10,224 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as FansRouteImport } from './routes/fans'
+import { Route as FixturesRouteImport } from './routes/fixtures'
+import { Route as GalleryRouteImport } from './routes/gallery'
+import { Route as HonoursRouteImport } from './routes/honours'
+import { Route as NewsRouteImport } from './routes/news'
+import { Route as SquadRouteImport } from './routes/squad'
+import { Route as StandingsRouteImport } from './routes/standings'
+import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
+import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
+import { Route as NewsSlugRouteImport } from './routes/news.$slug'
+import { Route as SquadPlayerIdRouteImport } from './routes/squad.$playerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FansRoute = FansRouteImport.update({
+  id: '/fans',
+  path: '/fans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FixturesRoute = FixturesRouteImport.update({
+  id: '/fixtures',
+  path: '/fixtures',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GalleryRoute = GalleryRouteImport.update({
+  id: '/gallery',
+  path: '/gallery',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HonoursRoute = HonoursRouteImport.update({
+  id: '/honours',
+  path: '/honours',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsRoute = NewsRouteImport.update({
+  id: '/news',
+  path: '/news',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SquadRoute = SquadRouteImport.update({
+  id: '/squad',
+  path: '/squad',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const StandingsRoute = StandingsRouteImport.update({
+  id: '/standings',
+  path: '/standings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedAdminRoute = AuthenticatedAdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const MatchesMatchIdRoute = MatchesMatchIdRouteImport.update({
+  id: '/matches/$matchId',
+  path: '/matches/$matchId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => NewsRoute,
+} as any)
+const SquadPlayerIdRoute = SquadPlayerIdRouteImport.update({
+  id: '/$playerId',
+  path: '/$playerId',
+  getParentRoute: () => SquadRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/fans': typeof FansRoute
+  '/fixtures': typeof FixturesRoute
+  '/gallery': typeof GalleryRoute
+  '/honours': typeof HonoursRoute
+  '/news': typeof NewsRouteWithChildren
+  '/squad': typeof SquadRouteWithChildren
+  '/standings': typeof StandingsRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/matches/$matchId': typeof MatchesMatchIdRoute
+  '/news/$slug': typeof NewsSlugRoute
+  '/squad/$playerId': typeof SquadPlayerIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/fans': typeof FansRoute
+  '/fixtures': typeof FixturesRoute
+  '/gallery': typeof GalleryRoute
+  '/honours': typeof HonoursRoute
+  '/news': typeof NewsRouteWithChildren
+  '/squad': typeof SquadRouteWithChildren
+  '/standings': typeof StandingsRoute
+  '/admin': typeof AuthenticatedAdminRoute
+  '/matches/$matchId': typeof MatchesMatchIdRoute
+  '/news/$slug': typeof NewsSlugRoute
+  '/squad/$playerId': typeof SquadPlayerIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/auth': typeof AuthRoute
+  '/contact': typeof ContactRoute
+  '/fans': typeof FansRoute
+  '/fixtures': typeof FixturesRoute
+  '/gallery': typeof GalleryRoute
+  '/honours': typeof HonoursRoute
+  '/news': typeof NewsRouteWithChildren
+  '/squad': typeof SquadRouteWithChildren
+  '/standings': typeof StandingsRoute
+  '/_authenticated/admin': typeof AuthenticatedAdminRoute
+  '/matches/$matchId': typeof MatchesMatchIdRoute
+  '/news/$slug': typeof NewsSlugRoute
+  '/squad/$playerId': typeof SquadPlayerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/fans'
+    | '/fixtures'
+    | '/gallery'
+    | '/honours'
+    | '/news'
+    | '/squad'
+    | '/standings'
+    | '/admin'
+    | '/matches/$matchId'
+    | '/news/$slug'
+    | '/squad/$playerId'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/fans'
+    | '/fixtures'
+    | '/gallery'
+    | '/honours'
+    | '/news'
+    | '/squad'
+    | '/standings'
+    | '/admin'
+    | '/matches/$matchId'
+    | '/news/$slug'
+    | '/squad/$playerId'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/about'
+    | '/auth'
+    | '/contact'
+    | '/fans'
+    | '/fixtures'
+    | '/gallery'
+    | '/honours'
+    | '/news'
+    | '/squad'
+    | '/standings'
+    | '/_authenticated/admin'
+    | '/matches/$matchId'
+    | '/news/$slug'
+    | '/squad/$playerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  AuthRoute: typeof AuthRoute
+  ContactRoute: typeof ContactRoute
+  FansRoute: typeof FansRoute
+  FixturesRoute: typeof FixturesRoute
+  GalleryRoute: typeof GalleryRoute
+  HonoursRoute: typeof HonoursRoute
+  NewsRoute: typeof NewsRouteWithChildren
+  SquadRoute: typeof SquadRouteWithChildren
+  StandingsRoute: typeof StandingsRoute
+  MatchesMatchIdRoute: typeof MatchesMatchIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,11 +239,159 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fans': {
+      id: '/fans'
+      path: '/fans'
+      fullPath: '/fans'
+      preLoaderRoute: typeof FansRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/fixtures': {
+      id: '/fixtures'
+      path: '/fixtures'
+      fullPath: '/fixtures'
+      preLoaderRoute: typeof FixturesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/gallery': {
+      id: '/gallery'
+      path: '/gallery'
+      fullPath: '/gallery'
+      preLoaderRoute: typeof GalleryRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/honours': {
+      id: '/honours'
+      path: '/honours'
+      fullPath: '/honours'
+      preLoaderRoute: typeof HonoursRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news': {
+      id: '/news'
+      path: '/news'
+      fullPath: '/news'
+      preLoaderRoute: typeof NewsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/squad': {
+      id: '/squad'
+      path: '/squad'
+      fullPath: '/squad'
+      preLoaderRoute: typeof SquadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/standings': {
+      id: '/standings'
+      path: '/standings'
+      fullPath: '/standings'
+      preLoaderRoute: typeof StandingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated/admin': {
+      id: '/_authenticated/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AuthenticatedAdminRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/matches/$matchId': {
+      id: '/matches/$matchId'
+      path: '/matches/$matchId'
+      fullPath: '/matches/$matchId'
+      preLoaderRoute: typeof MatchesMatchIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
+      parentRoute: typeof NewsRoute
+    }
+    '/squad/$playerId': {
+      id: '/squad/$playerId'
+      path: '/$playerId'
+      fullPath: '/squad/$playerId'
+      preLoaderRoute: typeof SquadPlayerIdRouteImport
+      parentRoute: typeof SquadRoute
+    }
   }
 }
 
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedAdminRoute: typeof AuthenticatedAdminRoute
+}
+
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedAdminRoute: AuthenticatedAdminRoute,
+}
+
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
+
+interface NewsRouteChildren {
+  NewsSlugRoute: typeof NewsSlugRoute
+}
+
+const NewsRouteChildren: NewsRouteChildren = {
+  NewsSlugRoute: NewsSlugRoute,
+}
+
+const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
+
+interface SquadRouteChildren {
+  SquadPlayerIdRoute: typeof SquadPlayerIdRoute
+}
+
+const SquadRouteChildren: SquadRouteChildren = {
+  SquadPlayerIdRoute: SquadPlayerIdRoute,
+}
+
+const SquadRouteWithChildren = SquadRoute._addFileChildren(SquadRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
+  AuthRoute: AuthRoute,
+  ContactRoute: ContactRoute,
+  FansRoute: FansRoute,
+  FixturesRoute: FixturesRoute,
+  GalleryRoute: GalleryRoute,
+  HonoursRoute: HonoursRoute,
+  NewsRoute: NewsRouteWithChildren,
+  SquadRoute: SquadRouteWithChildren,
+  StandingsRoute: StandingsRoute,
+  MatchesMatchIdRoute: MatchesMatchIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

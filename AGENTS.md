@@ -28,3 +28,9 @@ use the editor.
   own key and store it in Secrets.
 - **Secrets.** Lovable manages them. Do not put secret values in the repo.
 <!-- LOVABLE:END -->
+
+## Application architecture
+- Keep public content in typed club_records grouped by kind, with JSON details validated by the shared content schema; this supports editable modules without inventing club records.
+- Enforce staff permissions in database RLS and authenticated server functions; browser role checks only control presentation.
+- Use public route loaders for published club content and protected server functions for staff content; private media URLs are signed only after verifying published references or staff permission.
+- Reuse club navigation, page headings and record views from components; leaf routes own their metadata and URLs.
