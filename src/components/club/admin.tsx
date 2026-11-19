@@ -16,7 +16,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import { getStaffData, saveRecord, deleteRecord } from "@/lib/club.functions";
+import { getStaffData, saveRecord, deleteRecord, getSetupStatus, claimFirstAdmin } from "@/lib/club.functions";
 import { kinds, canManage, type Kind, type ClubRecord, type Details } from "@/lib/club";
 import { PageHeading } from "./shell";
 import { Empty } from "./content";
@@ -191,6 +191,7 @@ export function AdminPage() {
               You are signed in, but no club staff role has been assigned to your account. The club
               owner must authorise access before you can manage records.
             </p>
+            <FirstSetup />
             <Button
               className="mt-6"
               variant="outline"
@@ -574,5 +575,43 @@ export function AdminPage() {
         </div>
       )}
     </>
+  );
+}
+
+function FirstSetup() {
+  const status = useServerFn(getSetupStatus);
+  const claim = useServerFn(claimFirstAdmin);
+  const qc = useQueryClient();
+  const [busy, setBusy] = useState(false);
+  const q = useQuery({ queryKey: ["club-setup"], queryFn: () => status() });
+  if (!q.data?.available) return null;
+  return (
+    <div className="mt-6 border-t pt-6">
+      <h3 className="font-bold">FIRST-TIME CLUB SETUP</h3>
+      <p className="text-sm text-muted-foreground leading-7">
+        No club administrator exists yet. Claim this one-time setup to make this account the
+        club&apos;s super admin. Once claimed, this option closes permanently.
+      </p>
+      <Button
+        variant="gold"
+        className="mt-4"
+        disabled={busy}
+        onClick={async () => {
+          setBusy(true);
+          try {
+            await claim();
+            toast.success("You are now the club super admin");
+            await qc.invalidateQueries();
+          } catch (e) {
+            toast.error(e instanceof Error ? e.message : "Setup failed");
+            await q.refetch();
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        {busy ? "Please wait…" : "BECOME SUPER ADMIN"}
+      </Button>
+    </div>
   );
 }

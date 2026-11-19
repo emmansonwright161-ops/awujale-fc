@@ -164,3 +164,18 @@ export const sendContact = createServerFn({ method: "POST" })
     if (error) throw new Error("Your message could not be saved. Please try again.");
     return { success: true };
   });
+export const getSetupStatus = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("club_setup_available");
+    if (error) throw new Error("Setup status could not be checked.");
+    return { available: Boolean(data) };
+  });
+export const claimFirstAdmin = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const { data, error } = await context.supabase.rpc("claim_first_super_admin");
+    if (error) throw new Error("Setup could not be completed.");
+    if (!data) throw new Error("Club setup has already been completed.");
+    return { success: true };
+  });

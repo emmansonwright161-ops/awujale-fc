@@ -22,6 +22,13 @@
       "when": 1795088387134,
       "tag": "0002_restrict_role_function",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1795096202946,
+      "tag": "0003_first_staff_setup",
+      "breakpoints": true
     }
   ]
 }

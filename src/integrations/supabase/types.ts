@@ -125,6 +125,8 @@ export type Database = {
     }
     Functions: {
       can_manage_club: { Args: { _kind: string }; Returns: boolean }
+      claim_first_super_admin: { Args: never; Returns: boolean }
+      club_setup_available: { Args: never; Returns: boolean }
     }
     Enums: {
       club_role: "super_admin" | "club_admin" | "editor" | "matchday_manager"
