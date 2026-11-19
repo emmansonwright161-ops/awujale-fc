@@ -15,19 +15,25 @@ import { Button } from "@/components/ui/button";
 import { clubQuery } from "@/lib/club.queries";
 import matchday from "@/assets/club-matchday.asset.json";
 import training from "@/assets/club-training.asset.json";
-import { MatchCard, RecordCard, SectionHeading } from "./content";
+import { clubResults, clubGoals } from "@/lib/club";
+import { Crest } from "./shell";
+import { Empty, MatchCard, RecordCard, SectionHeading } from "./content";
 export function HomePage() {
   const { data } = useSuspenseQuery(clubQuery);
   const reduced = useReducedMotion();
   const upcoming = data
     .filter((r) => r.kind === "fixtures" && r.details.status === "Upcoming")
     .sort((a, b) => Date.parse(a.details.kickoff || "") - Date.parse(b.details.kickoff || ""));
-  const results = data
-    .filter((r) => r.kind === "fixtures" && r.details.status === "Completed")
-    .sort((a, b) => Date.parse(b.details.kickoff || "") - Date.parse(a.details.kickoff || ""));
-  const news = data.filter((r) => r.kind === "news").slice(0, 3);
+  const results = clubResults(data).sort(
+    (a, b) => Date.parse(b.details.kickoff || "") - Date.parse(a.details.kickoff || ""),
+  );
+  const news = data
+    .filter((r) => r.kind === "news")
+    .sort((a, b) => Number(Boolean(b.details.featured)) - Number(Boolean(a.details.featured)))
+    .slice(0, 3);
   const players = data.filter((r) => r.kind === "players").slice(0, 4);
   const sponsors = data.filter((r) => r.kind === "sponsors");
+  const gallery = data.filter((r) => r.kind === "gallery" && r.details.image).slice(0, 3);
   return (
     <>
       <section className="hero-section">
@@ -39,6 +45,9 @@ export function HomePage() {
         />
         <div className="hero-overlay" />
         <div className="club-container hero-content">
+          <div className="hero-crest">
+            <Crest large />
+          </div>
           <motion.div
             initial={reduced ? false : { opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -297,19 +306,7 @@ export function HomePage() {
           <div className="stats-grid">
             {[
               ["MATCHES PLAYED", results.length || "—"],
-              [
-                "GOALS SCORED",
-                results.length
-                  ? results.reduce(
-                      (sum, r) =>
-                        sum +
-                        (r.details.homeTeam === "AWUJALE BOYZ FC"
-                          ? r.details.homeScore || 0
-                          : r.details.awayScore || 0),
-                      0,
-                    )
-                  : "—",
-              ],
+              ["GOALS SCORED", results.length ? clubGoals(data) : "—"],
               ["FIRST-TEAM PLAYERS", data.filter((r) => r.kind === "players").length || "—"],
               ["VERIFIED HONOURS", data.filter((r) => r.kind === "honours").length || "—"],
             ].map(([label, value]) => (
@@ -322,6 +319,66 @@ export function HomePage() {
           <p className="temporary-caption">
             Only confirmed club records are shown. A dash means official data is pending.
           </p>
+        </div>
+      </section>
+      <section className="section pt-0">
+        <div className="club-container">
+          <SectionHeading
+            kicker="THE NEXT KICK-OFF"
+            title="UPCOMING FIXTURES"
+            to="/fixtures"
+            label="Full schedule"
+          />
+          {upcoming.length ? (
+            <div className="record-grid">
+              {upcoming.slice(0, 3).map((r) => (
+                <MatchCard record={r} next key={r.id} />
+              ))}
+            </div>
+          ) : (
+            <Empty
+              title="Next fixtures to be announced"
+              description="Confirmed opponents, kick-off times and venues will appear here."
+            />
+          )}
+        </div>
+      </section>
+      <section className="section pt-0">
+        <div className="club-container">
+          <SectionHeading
+            kicker="THE MOMENTS THAT MATTER"
+            title="FROM THE TOUCHLINE"
+            to="/gallery"
+            label="Explore gallery"
+          />
+          <div className="record-grid">
+            {gallery.length
+              ? gallery.map((r) => (
+                  <Link to="/gallery" className="gallery-preview" key={r.id}>
+                    <img src={r.details.image} alt={r.title} loading="lazy" />
+                    <span>
+                      {r.title}
+                      <ArrowUpRight size={16} />
+                    </span>
+                  </Link>
+                ))
+              : [training, matchday].map((asset, i) => (
+                  <Link to="/gallery" className="gallery-preview" key={asset.url}>
+                    <img
+                      src={asset.url}
+                      alt="Temporary AI-generated football imagery, not actual club members"
+                      loading="lazy"
+                    />
+                    <span>
+                      {i ? "MATCHDAY INSPIRATION" : "TRAINING INSPIRATION"}
+                      <ArrowUpRight size={16} />
+                    </span>
+                    <p className="temporary-caption">
+                      Temporary AI-generated imagery · Official photographs pending
+                    </p>
+                  </Link>
+                ))}
+          </div>
         </div>
       </section>
       <section className="section pt-0">

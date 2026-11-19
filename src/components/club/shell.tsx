@@ -13,8 +13,20 @@ import {
   Heart,
   MapPin,
 } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
+import { clubQuery } from "@/lib/club.queries";
 import { Button } from "@/components/ui/button";
 export function Crest({ large = false }: { large?: boolean }) {
+  const { data } = useQuery(clubQuery);
+  const official = data?.find((r) => r.kind === "settings")?.details.image;
+  if (official)
+    return (
+      <img
+        className={`official-crest ${large ? "large" : ""}`}
+        src={official}
+        alt="AWUJALE BOYZ FC official crest"
+      />
+    );
   return (
     <span
       className={`crest ${large ? "large" : ""}`}

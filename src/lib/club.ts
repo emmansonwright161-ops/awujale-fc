@@ -41,7 +41,23 @@ export const detailSchema = z.object({
   email: z.string().email().optional(),
   phone: z.string().optional(),
   excerpt: z.string().optional(),
-  video: z.string().url().optional(),
+  video: z
+    .string()
+    .refine(
+      (v) => v.startsWith("club/") || /^https:\/\//.test(v),
+      "Use a secure video URL or uploaded club path",
+    )
+    .optional(),
+  homeCrest: z.string().optional(),
+  awayCrest: z.string().optional(),
+  mission: z.string().max(4000).optional(),
+  vision: z.string().max(4000).optional(),
+  objectives: z.string().max(4000).optional(),
+  philosophy: z.string().max(4000).optional(),
+  scorers: z.string().max(4000).optional(),
+  statistics: z.string().max(4000).optional(),
+  performance: z.string().max(4000).optional(),
+  featured: z.boolean().optional(),
   consent: z.boolean().optional(),
 });
 export type Details = z.infer<typeof detailSchema>;
@@ -176,6 +192,24 @@ export function calculateStandings(
     .sort(
       (a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf || a.club.localeCompare(b.club),
     );
+}
+export function clubResults(records: ClubRecord[]) {
+  return records.filter(
+    (r) =>
+      r.kind === "fixtures" &&
+      r.details.status === "Completed" &&
+      (r.details.homeTeam === "AWUJALE BOYZ FC" || r.details.awayTeam === "AWUJALE BOYZ FC"),
+  );
+}
+export function clubGoals(records: ClubRecord[]) {
+  return clubResults(records).reduce(
+    (sum, r) =>
+      sum +
+      (r.details.homeTeam === "AWUJALE BOYZ FC"
+        ? (r.details.homeScore ?? 0)
+        : (r.details.awayScore ?? 0)),
+    0,
+  );
 }
 export function pageHead(title: string, description: string) {
   return {

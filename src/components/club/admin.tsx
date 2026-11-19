@@ -41,6 +41,7 @@ const fields: Record<Kind, string[]> = {
     "appearances",
     "goals",
     "assists",
+    "performance",
     "body",
   ],
   staff: ["position", "nationality", "body"],
@@ -54,6 +55,10 @@ const fields: Record<Kind, string[]> = {
     "status",
     "homeScore",
     "awayScore",
+    "homeCrest",
+    "awayCrest",
+    "scorers",
+    "statistics",
     "body",
   ],
   competitions: ["season", "winPoints", "drawPoints", "lossPoints"],
@@ -62,7 +67,7 @@ const fields: Record<Kind, string[]> = {
   gallery: ["category", "video", "body"],
   honours: ["category", "date", "body"],
   sponsors: ["link", "body"],
-  settings: ["email", "phone", "body"],
+  settings: ["email", "phone", "mission", "vision", "objectives", "philosophy", "body"],
 };
 const fieldLabels: Record<string, string> = {
   body: "Biography / full description / report",
@@ -109,7 +114,10 @@ export function AdminPage() {
       setError(result.error.message);
       return;
     }
-    setImage(path);
+    if (file.type === "video/mp4") {
+      const field = document.querySelector<HTMLInputElement>('[name="video"]');
+      if (field) field.value = path;
+    } else setImage(path);
     toast.success("Media uploaded");
   }
   async function submit(e: FormEvent<HTMLFormElement>) {
@@ -139,6 +147,7 @@ export function AdminPage() {
             : value;
     }
     if (image) details["image"] = image;
+    details["featured"] = form.get("featured") === "on";
     try {
       await save({
         data: {
@@ -498,10 +507,22 @@ export function AdminPage() {
               </span>
               <input
                 type="file"
-                accept="image/jpeg,image/png,image/webp"
+                accept={
+                  editing.kind === "gallery"
+                    ? "image/jpeg,image/png,image/webp,video/mp4"
+                    : "image/jpeg,image/png,image/webp"
+                }
                 onChange={(e) => upload(e.target.files?.[0])}
                 disabled={uploading}
               />
+            </label>
+            <label className="checkbox-row">
+              <input
+                type="checkbox"
+                name="featured"
+                defaultChecked={editing.record?.details.featured}
+              />
+              <span>Feature this record on the homepage</span>
             </label>
             <label className="checkbox-row">
               <input type="checkbox" name="published" defaultChecked={editing.record?.published} />

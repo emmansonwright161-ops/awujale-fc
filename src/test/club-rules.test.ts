@@ -1,6 +1,8 @@
 import { describe, it, expect } from "vitest";
 import {
   canManage,
+  clubResults,
+  clubGoals,
   calculateStandings,
   recordSchema,
   supporterSchema,
@@ -23,6 +25,21 @@ const match = (home: number | undefined, away: number | undefined, status = "Com
     },
   }) as ClubRecord;
 describe("Club data integrity", () => {
+  it("excludes other league teams from club match statistics", () => {
+    const unrelated = {
+      ...match(5, 2),
+      details: { ...match(5, 2).details, homeTeam: "Other team", awayTeam: "Another team" },
+    };
+    expect(clubResults([match(2, 0), unrelated])).toHaveLength(1);
+    expect(clubGoals([match(2, 0), unrelated])).toBe(2);
+  });
+  it("counts the club goals correctly in away matches", () => {
+    const away = {
+      ...match(1, 3),
+      details: { ...match(1, 3).details, homeTeam: "Test opponent", awayTeam: "AWUJALE BOYZ FC" },
+    };
+    expect(clubGoals([away])).toBe(3);
+  });
   it("does not calculate standings from unverified scores", () => {
     expect(calculateStandings([match(undefined, undefined)])).toEqual([]);
   });

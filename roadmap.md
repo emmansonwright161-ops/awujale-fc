@@ -1,4 +1,8 @@
 # Club website roadmap
+- [x] Re-audit every public route at desktop and phone widths
+- [x] Restore homepage fixture/gallery previews and editable statements
+- [x] Correct away-team crests, Lagos kick-off times and club-only totals
+- [x] Support uploaded video references and featured content
 - [x] Premium design, navigation, homepage and mobile experience
 - [x] All club, football, editorial and engagement routes
 - [x] Cloud content storage, secure roles, administration and media management

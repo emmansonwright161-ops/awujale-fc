@@ -106,16 +106,30 @@ export function MatchCard({
       </div>
       <div className="match-teams">
         <div className="team">
-          <Crest />
+          {d?.homeCrest ? (
+            <img className="official-crest" src={d.homeCrest} alt={`${d.homeTeam} crest`} />
+          ) : !d?.homeTeam || d.homeTeam === "AWUJALE BOYZ FC" ? (
+            <Crest />
+          ) : (
+            <span className="opponent-crest">
+              <Shield size={27} />
+            </span>
+          )}
           <span className="team-name">{d?.homeTeam || "AWUJALE BOYZ FC"}</span>
         </div>
         <span className="versus">
           {d?.status === "Completed" ? `${d.homeScore} – ${d.awayScore}` : "VS"}
         </span>
         <div className="team">
-          <span className="opponent-crest">
-            <Shield size={27} />
-          </span>
+          {d?.awayCrest ? (
+            <img className="official-crest" src={d.awayCrest} alt={`${d.awayTeam} crest`} />
+          ) : d?.awayTeam === "AWUJALE BOYZ FC" ? (
+            <Crest />
+          ) : (
+            <span className="opponent-crest">
+              <Shield size={27} />
+            </span>
+          )}
           <span className="team-name">{d?.awayTeam || "TO BE ANNOUNCED"}</span>
         </div>
       </div>
@@ -132,6 +146,17 @@ export function MatchCard({
               })
             : "Date to be confirmed"}
         </span>
+        {d?.kickoff && (
+          <span>
+            <Clock3 />
+            {new Date(d.kickoff).toLocaleTimeString("en-GB", {
+              hour: "2-digit",
+              minute: "2-digit",
+              timeZone: "Africa/Lagos",
+            })}{" "}
+            WAT
+          </span>
+        )}
         <span>
           <MapPin />
           {d?.venue || "Venue to be confirmed"}
@@ -402,7 +427,10 @@ export function StandingsPage() {
             className="form-input w-auto"
             aria-label="Standings competition"
             value={competition || comps[0]?.title || ""}
-            onChange={(e) => setCompetition(e.target.value)}
+            onChange={(e) => {
+              setCompetition(e.target.value);
+              setSeason("");
+            }}
           >
             {!comps.length && <option value="">Competition to be confirmed</option>}
             {comps.map((c) => (
@@ -739,6 +767,21 @@ export function AboutPage() {
             </div>
           ))}
         </div>
+        <div className="values-row">
+          {(
+            [
+              ["Mission", "mission"],
+              ["Vision", "vision"],
+              ["Club objectives", "objectives"],
+              ["Coaching philosophy", "philosophy"],
+            ] as const
+          ).map(([title, key]) => (
+            <div key={key}>
+              <h3>{title}</h3>
+              <p>{settings?.details[key] || "Official club statement awaiting confirmation."}</p>
+            </div>
+          ))}
+        </div>
         <div className="mt-14">
           <SectionHeading kicker="THE PEOPLE BEHIND THE BADGE" title="Leadership & coaching" />
           {staff.length ? (
@@ -813,17 +856,48 @@ export function DetailPage({ kind, id }: { kind: Kind; id: string }) {
           <div className="article-text">
             {d.body || "Further verified details will be published by the club."}
           </div>
+          {kind === "players" && (
+            <div className="mt-8">
+              <h2 className="text-3xl">PERFORMANCE HISTORY</h2>
+              <p className="article-text mt-4">
+                {d.performance || "Verified performance history will be published here."}
+              </p>
+            </div>
+          )}
+          {kind === "fixtures" && (
+            <div className="values-row">
+              <div>
+                <h3>Goal scorers</h3>
+                <p className="whitespace-pre-wrap">
+                  {d.scorers || "Verified goal scorer details pending."}
+                </p>
+              </div>
+              <div>
+                <h3>Match statistics</h3>
+                <p className="whitespace-pre-wrap">
+                  {d.statistics || "Verified match statistics pending."}
+                </p>
+              </div>
+            </div>
+          )}
           {kind === "news" && (
             <Button
               variant="outline"
               className="mt-7"
               onClick={async () => {
-                if (navigator.share)
-                  await navigator.share({ title: r.title, url: window.location.href });
-                else {
-                  await navigator.clipboard.writeText(window.location.href);
-                  const { toast } = await import("sonner");
-                  toast.success("Article link copied");
+                try {
+                  if (navigator.share)
+                    await navigator.share({ title: r.title, url: window.location.href });
+                  else {
+                    await navigator.clipboard.writeText(window.location.href);
+                    const { toast } = await import("sonner");
+                    toast.success("Article link copied");
+                  }
+                } catch (error) {
+                  if (error instanceof Error && error.name !== "AbortError") {
+                    const { toast } = await import("sonner");
+                    toast.error("Sharing is unavailable. Please copy the page address.");
+                  }
                 }
               }}
             >

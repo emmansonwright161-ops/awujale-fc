@@ -27,23 +27,37 @@ async function publicClient() {
   });
 }
 async function resolveImages(rows: ClubRecord[]) {
-  const paths = rows
-    .map((r) => r.details.image)
-    .filter((p): p is string => Boolean(p?.startsWith("club/")));
+  const mediaKeys = ["image", "video", "homeCrest", "awayCrest"] as const;
+  const paths = [
+    ...new Set(
+      rows
+        .flatMap((r) => mediaKeys.map((k) => r.details[k]))
+        .filter((p): p is string => Boolean(p?.startsWith("club/"))),
+    ),
+  ];
   if (!paths.length) return rows;
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin.storage
     .from("club-media")
     .createSignedUrls(paths, 3600);
   if (error) throw error;
-  const urls = new Map(data?.map((i) => [i.path, i.signedUrl]));
-  return rows.map((r) => ({
-    ...r,
-    details: {
-      ...r.details,
-      image: (r.details.image ? urls.get(r.details.image) : undefined) || r.details.image,
-    },
-  }));
+  const browserBase = import.meta.env['VITE_SUPABASE_URL'];
+  const urls = new Map(
+    data?.map((i) => [
+      i.path,
+      i.signedUrl && browserBase
+        ? i.signedUrl.replace(new URL(i.signedUrl).origin, browserBase)
+        : i.signedUrl,
+    ]),
+  );
+  return rows.map((r) => {
+    const details = { ...r.details };
+    for (const key of mediaKeys) {
+      const value = details[key];
+      if (value?.startsWith("club/")) details[key] = urls.get(value) || value;
+    }
+    return { ...r, details };
+  });
 }
 export const getPublished = createServerFn({ method: "GET" }).handler(async () => {
   const db = await publicClient();
