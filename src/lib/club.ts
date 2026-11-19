@@ -1,21 +1,191 @@
-import { z } from 'zod';
-export const kinds = ['players','staff','fixtures','competitions','teams','news','gallery','honours','sponsors','settings'] as const;
-export type Kind = typeof kinds[number];
+import { z } from "zod";
+export const kinds = [
+  "players",
+  "staff",
+  "fixtures",
+  "competitions",
+  "teams",
+  "news",
+  "gallery",
+  "honours",
+  "sponsors",
+  "settings",
+] as const;
+export type Kind = (typeof kinds)[number];
 export const detailSchema = z.object({
-  body: z.string().max(20000).optional(), image: z.string().optional(), position: z.string().optional(), number: z.coerce.number().int().min(0).max(99).optional(), nationality: z.string().optional(), status: z.string().optional(), appearances: z.coerce.number().int().nonnegative().optional(), goals: z.coerce.number().int().nonnegative().optional(), assists: z.coerce.number().int().nonnegative().optional(), opponent: z.string().optional(), homeTeam: z.string().optional(), awayTeam: z.string().optional(), kickoff: z.string().optional(), venue: z.string().optional(), competition: z.string().optional(), season: z.string().optional(), homeScore: z.coerce.number().int().nonnegative().optional(), awayScore: z.coerce.number().int().nonnegative().optional(), category: z.string().optional(), author: z.string().optional(), date: z.string().optional(), link: z.string().url().optional(), winPoints: z.coerce.number().int().nonnegative().optional(), drawPoints: z.coerce.number().int().nonnegative().optional(), lossPoints: z.coerce.number().int().nonnegative().optional(), email: z.string().email().optional(), phone: z.string().optional(), excerpt: z.string().optional(), video: z.string().url().optional(), consent: z.boolean().optional(),
+  body: z.string().max(20000).optional(),
+  image: z.string().optional(),
+  position: z.string().optional(),
+  number: z.coerce.number().int().min(0).max(99).optional(),
+  nationality: z.string().optional(),
+  status: z.string().optional(),
+  appearances: z.coerce.number().int().nonnegative().optional(),
+  goals: z.coerce.number().int().nonnegative().optional(),
+  assists: z.coerce.number().int().nonnegative().optional(),
+  opponent: z.string().optional(),
+  homeTeam: z.string().optional(),
+  awayTeam: z.string().optional(),
+  kickoff: z.string().optional(),
+  venue: z.string().optional(),
+  competition: z.string().optional(),
+  season: z.string().optional(),
+  homeScore: z.coerce.number().int().nonnegative().optional(),
+  awayScore: z.coerce.number().int().nonnegative().optional(),
+  category: z.string().optional(),
+  author: z.string().optional(),
+  date: z.string().optional(),
+  link: z.string().url().optional(),
+  winPoints: z.coerce.number().int().nonnegative().optional(),
+  drawPoints: z.coerce.number().int().nonnegative().optional(),
+  lossPoints: z.coerce.number().int().nonnegative().optional(),
+  email: z.string().email().optional(),
+  phone: z.string().optional(),
+  excerpt: z.string().optional(),
+  video: z.string().url().optional(),
+  consent: z.boolean().optional(),
 });
 export type Details = z.infer<typeof detailSchema>;
-export type ClubRecord = {id:string; kind:Kind; title:string; slug:string|null; published:boolean; details:Details; created_at:string};
-export const recordSchema = z.object({id:z.string().uuid().optional(),kind:z.enum(kinds),title:z.string().trim().min(1).max(200),slug:z.string().trim().max(200).optional(),published:z.boolean(),details:detailSchema}).superRefine((r,c)=>{
-  if(r.kind==='fixtures' && r.published){ for(const key of ['homeTeam','awayTeam','kickoff','competition','season','status'] as const) if(!r.details[key]) c.addIssue({code:'custom',message:`${key} is required for a published fixture`,path:['details',key]}); if(r.details.status==='Completed'&&(r.details.homeScore===undefined||r.details.awayScore===undefined)) c.addIssue({code:'custom',message:'A completed fixture requires both verified scores'}); }
+export type ClubRecord = {
+  id: string;
+  kind: Kind;
+  title: string;
+  slug: string | null;
+  published: boolean;
+  details: Details;
+  created_at: string;
+};
+export const recordSchema = z
+  .object({
+    id: z.string().uuid().optional(),
+    kind: z.enum(kinds),
+    title: z.string().trim().min(1).max(200),
+    slug: z.string().trim().max(200).optional(),
+    published: z.boolean(),
+    details: detailSchema,
+  })
+  .superRefine((r, c) => {
+    if (r.kind === "fixtures" && r.published) {
+      for (const key of [
+        "homeTeam",
+        "awayTeam",
+        "kickoff",
+        "competition",
+        "season",
+        "status",
+      ] as const)
+        if (!r.details[key])
+          c.addIssue({
+            code: "custom",
+            message: `${key} is required for a published fixture`,
+            path: ["details", key],
+          });
+      if (
+        r.details.status === "Completed" &&
+        (r.details.homeScore === undefined || r.details.awayScore === undefined)
+      )
+        c.addIssue({
+          code: "custom",
+          message: "A completed fixture requires both verified scores",
+        });
+    }
+  });
+export const supporterSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(254),
+  location: z.string().max(200).optional(),
+  consent: z.literal(true),
 });
-export const supporterSchema=z.object({name:z.string().trim().min(2).max(120),email:z.string().trim().email().max(254),location:z.string().max(200).optional(),consent:z.literal(true)});
-export const contactSchema=z.object({name:z.string().trim().min(2).max(120),email:z.string().trim().email().max(254),subject:z.string().trim().min(2).max(200),message:z.string().trim().min(10).max(5000)});
-export function canManage(roles:string[],kind:string){return roles.some(r=>r==='super_admin'||r==='club_admin'||(r==='editor'&&['news','gallery'].includes(kind))||(r==='matchday_manager'&&['fixtures','competitions','teams'].includes(kind)));}
-export type Standing={club:string;played:number;won:number;drawn:number;lost:number;gf:number;ga:number;gd:number;points:number};
-export function calculateStandings(matches:ClubRecord[],teams:string[]=[],rules={win:3,draw:1,loss:0}){
- const rows=new Map<string,Standing>(); const get=(club:string)=>{let row=rows.get(club);if(!row){row={club,played:0,won:0,drawn:0,lost:0,gf:0,ga:0,gd:0,points:0};rows.set(club,row);}return row;};teams.forEach(get);
- for(const m of matches){const d=m.details;if(d.status!=='Completed'||d.homeScore===undefined||d.awayScore===undefined||!d.homeTeam||!d.awayTeam)continue;const h=get(d.homeTeam),a=get(d.awayTeam);h.played++;a.played++;h.gf+=d.homeScore;h.ga+=d.awayScore;a.gf+=d.awayScore;a.ga+=d.homeScore;if(d.homeScore>d.awayScore){h.won++;a.lost++;h.points+=rules.win;a.points+=rules.loss;}else if(d.homeScore<d.awayScore){a.won++;h.lost++;a.points+=rules.win;h.points+=rules.loss;}else{h.drawn++;a.drawn++;h.points+=rules.draw;a.points+=rules.draw;}}
- return [...rows.values()].map(r=>({...r,gd:r.gf-r.ga})).sort((a,b)=>b.points-a.points||b.gd-a.gd||b.gf-a.gf||a.club.localeCompare(b.club));
+export const contactSchema = z.object({
+  name: z.string().trim().min(2).max(120),
+  email: z.string().trim().email().max(254),
+  subject: z.string().trim().min(2).max(200),
+  message: z.string().trim().min(10).max(5000),
+});
+export function canManage(roles: string[], kind: string) {
+  return roles.some(
+    (r) =>
+      r === "super_admin" ||
+      r === "club_admin" ||
+      (r === "editor" && ["news", "gallery"].includes(kind)) ||
+      (r === "matchday_manager" && ["fixtures", "competitions", "teams"].includes(kind)),
+  );
 }
-export function pageHead(title:string,description:string){return {meta:[{title:`${title} | AWUJALE BOYZ FC`},{name:'description',content:description},{property:'og:title',content:`${title} | AWUJALE BOYZ FC`},{property:'og:description',content:description},{property:'og:type',content:'website'},{name:'twitter:card',content:'summary_large_image'}]};}
+export type Standing = {
+  club: string;
+  played: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  gf: number;
+  ga: number;
+  gd: number;
+  points: number;
+};
+export function calculateStandings(
+  matches: ClubRecord[],
+  teams: string[] = [],
+  rules = { win: 3, draw: 1, loss: 0 },
+) {
+  const rows = new Map<string, Standing>();
+  const get = (club: string) => {
+    let row = rows.get(club);
+    if (!row) {
+      row = { club, played: 0, won: 0, drawn: 0, lost: 0, gf: 0, ga: 0, gd: 0, points: 0 };
+      rows.set(club, row);
+    }
+    return row;
+  };
+  teams.forEach(get);
+  for (const m of matches) {
+    const d = m.details;
+    if (
+      d.status !== "Completed" ||
+      d.homeScore === undefined ||
+      d.awayScore === undefined ||
+      !d.homeTeam ||
+      !d.awayTeam
+    )
+      continue;
+    const h = get(d.homeTeam),
+      a = get(d.awayTeam);
+    h.played++;
+    a.played++;
+    h.gf += d.homeScore;
+    h.ga += d.awayScore;
+    a.gf += d.awayScore;
+    a.ga += d.homeScore;
+    if (d.homeScore > d.awayScore) {
+      h.won++;
+      a.lost++;
+      h.points += rules.win;
+      a.points += rules.loss;
+    } else if (d.homeScore < d.awayScore) {
+      a.won++;
+      h.lost++;
+      a.points += rules.win;
+      h.points += rules.loss;
+    } else {
+      h.drawn++;
+      a.drawn++;
+      h.points += rules.draw;
+      a.points += rules.draw;
+    }
+  }
+  return [...rows.values()]
+    .map((r) => ({ ...r, gd: r.gf - r.ga }))
+    .sort(
+      (a, b) => b.points - a.points || b.gd - a.gd || b.gf - a.gf || a.club.localeCompare(b.club),
+    );
+}
+export function pageHead(title: string, description: string) {
+  return {
+    meta: [
+      { title: `${title} | AWUJALE BOYZ FC` },
+      { name: "description", content: description },
+      { property: "og:title", content: `${title} | AWUJALE BOYZ FC` },
+      { property: "og:description", content: description },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+    ],
+  };
+}

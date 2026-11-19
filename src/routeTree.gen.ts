@@ -19,12 +19,13 @@ import { Route as FixturesRouteImport } from './routes/fixtures'
 import { Route as GalleryRouteImport } from './routes/gallery'
 import { Route as HonoursRouteImport } from './routes/honours'
 import { Route as NewsRouteImport } from './routes/news'
+import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as SquadRouteImport } from './routes/squad'
 import { Route as StandingsRouteImport } from './routes/standings'
 import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/admin'
 import { Route as MatchesMatchIdRouteImport } from './routes/matches.$matchId'
-import { Route as NewsSlugRouteImport } from './routes/news.$slug'
-import { Route as SquadPlayerIdRouteImport } from './routes/squad.$playerId'
+import { Route as NewsSlugRouteImport } from './routes/news_.$slug'
+import { Route as SquadPlayerIdRouteImport } from './routes/squad_.$playerId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -75,6 +76,11 @@ const NewsRoute = NewsRouteImport.update({
   path: '/news',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SitemapDotxmlRoute = SitemapDotxmlRouteImport.update({
+  id: '/sitemap.xml',
+  path: '/sitemap.xml',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SquadRoute = SquadRouteImport.update({
   id: '/squad',
   path: '/squad',
@@ -96,14 +102,14 @@ const MatchesMatchIdRoute = MatchesMatchIdRouteImport.update({
   getParentRoute: () => rootRouteImport,
 } as any)
 const NewsSlugRoute = NewsSlugRouteImport.update({
-  id: '/$slug',
-  path: '/$slug',
-  getParentRoute: () => NewsRoute,
+  id: '/news_/$slug',
+  path: '/news/$slug',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SquadPlayerIdRoute = SquadPlayerIdRouteImport.update({
-  id: '/$playerId',
-  path: '/$playerId',
-  getParentRoute: () => SquadRoute,
+  id: '/squad_/$playerId',
+  path: '/squad/$playerId',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -115,8 +121,9 @@ export interface FileRoutesByFullPath {
   '/fixtures': typeof FixturesRoute
   '/gallery': typeof GalleryRoute
   '/honours': typeof HonoursRoute
-  '/news': typeof NewsRouteWithChildren
-  '/squad': typeof SquadRouteWithChildren
+  '/news': typeof NewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/squad': typeof SquadRoute
   '/standings': typeof StandingsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -132,8 +139,9 @@ export interface FileRoutesByTo {
   '/fixtures': typeof FixturesRoute
   '/gallery': typeof GalleryRoute
   '/honours': typeof HonoursRoute
-  '/news': typeof NewsRouteWithChildren
-  '/squad': typeof SquadRouteWithChildren
+  '/news': typeof NewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/squad': typeof SquadRoute
   '/standings': typeof StandingsRoute
   '/admin': typeof AuthenticatedAdminRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
@@ -151,13 +159,14 @@ export interface FileRoutesById {
   '/fixtures': typeof FixturesRoute
   '/gallery': typeof GalleryRoute
   '/honours': typeof HonoursRoute
-  '/news': typeof NewsRouteWithChildren
-  '/squad': typeof SquadRouteWithChildren
+  '/news': typeof NewsRoute
+  '/sitemap.xml': typeof SitemapDotxmlRoute
+  '/squad': typeof SquadRoute
   '/standings': typeof StandingsRoute
   '/_authenticated/admin': typeof AuthenticatedAdminRoute
   '/matches/$matchId': typeof MatchesMatchIdRoute
-  '/news/$slug': typeof NewsSlugRoute
-  '/squad/$playerId': typeof SquadPlayerIdRoute
+  '/news_/$slug': typeof NewsSlugRoute
+  '/squad_/$playerId': typeof SquadPlayerIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -171,6 +180,7 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/honours'
     | '/news'
+    | '/sitemap.xml'
     | '/squad'
     | '/standings'
     | '/admin'
@@ -188,6 +198,7 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/honours'
     | '/news'
+    | '/sitemap.xml'
     | '/squad'
     | '/standings'
     | '/admin'
@@ -206,12 +217,13 @@ export interface FileRouteTypes {
     | '/gallery'
     | '/honours'
     | '/news'
+    | '/sitemap.xml'
     | '/squad'
     | '/standings'
     | '/_authenticated/admin'
     | '/matches/$matchId'
-    | '/news/$slug'
-    | '/squad/$playerId'
+    | '/news_/$slug'
+    | '/squad_/$playerId'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -224,10 +236,13 @@ export interface RootRouteChildren {
   FixturesRoute: typeof FixturesRoute
   GalleryRoute: typeof GalleryRoute
   HonoursRoute: typeof HonoursRoute
-  NewsRoute: typeof NewsRouteWithChildren
-  SquadRoute: typeof SquadRouteWithChildren
+  NewsRoute: typeof NewsRoute
+  SitemapDotxmlRoute: typeof SitemapDotxmlRoute
+  SquadRoute: typeof SquadRoute
   StandingsRoute: typeof StandingsRoute
   MatchesMatchIdRoute: typeof MatchesMatchIdRoute
+  NewsSlugRoute: typeof NewsSlugRoute
+  SquadPlayerIdRoute: typeof SquadPlayerIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -302,6 +317,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/sitemap.xml': {
+      id: '/sitemap.xml'
+      path: '/sitemap.xml'
+      fullPath: '/sitemap.xml'
+      preLoaderRoute: typeof SitemapDotxmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/squad': {
       id: '/squad'
       path: '/squad'
@@ -330,19 +352,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof MatchesMatchIdRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/news/$slug': {
-      id: '/news/$slug'
-      path: '/$slug'
+    '/news_/$slug': {
+      id: '/news_/$slug'
+      path: '/news/$slug'
       fullPath: '/news/$slug'
       preLoaderRoute: typeof NewsSlugRouteImport
-      parentRoute: typeof NewsRoute
+      parentRoute: typeof rootRouteImport
     }
-    '/squad/$playerId': {
-      id: '/squad/$playerId'
-      path: '/$playerId'
+    '/squad_/$playerId': {
+      id: '/squad_/$playerId'
+      path: '/squad/$playerId'
       fullPath: '/squad/$playerId'
       preLoaderRoute: typeof SquadPlayerIdRouteImport
-      parentRoute: typeof SquadRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
@@ -358,26 +380,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface NewsRouteChildren {
-  NewsSlugRoute: typeof NewsSlugRoute
-}
-
-const NewsRouteChildren: NewsRouteChildren = {
-  NewsSlugRoute: NewsSlugRoute,
-}
-
-const NewsRouteWithChildren = NewsRoute._addFileChildren(NewsRouteChildren)
-
-interface SquadRouteChildren {
-  SquadPlayerIdRoute: typeof SquadPlayerIdRoute
-}
-
-const SquadRouteChildren: SquadRouteChildren = {
-  SquadPlayerIdRoute: SquadPlayerIdRoute,
-}
-
-const SquadRouteWithChildren = SquadRoute._addFileChildren(SquadRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -388,10 +390,13 @@ const rootRouteChildren: RootRouteChildren = {
   FixturesRoute: FixturesRoute,
   GalleryRoute: GalleryRoute,
   HonoursRoute: HonoursRoute,
-  NewsRoute: NewsRouteWithChildren,
-  SquadRoute: SquadRouteWithChildren,
+  NewsRoute: NewsRoute,
+  SitemapDotxmlRoute: SitemapDotxmlRoute,
+  SquadRoute: SquadRoute,
   StandingsRoute: StandingsRoute,
   MatchesMatchIdRoute: MatchesMatchIdRoute,
+  NewsSlugRoute: NewsSlugRoute,
+  SquadPlayerIdRoute: SquadPlayerIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

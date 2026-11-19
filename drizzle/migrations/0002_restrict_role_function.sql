@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.can_manage_club(text) FROM anon;

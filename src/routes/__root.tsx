@@ -87,12 +87,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { title: "AWUJALE BOYZ FC" },
       { name: "description", content: "The official football home of AWUJALE BOYZ FC, Ijebu-Ode." },
-      { name: "author", content: "Lovable" },
+      { name: "author", content: "AWUJALE BOYZ FC" },
       { property: "og:title", content: "AWUJALE BOYZ FC" },
-      { property: "og:description", content: "The official football home of AWUJALE BOYZ FC, Ijebu-Ode." },
+      {
+        property: "og:description",
+        content: "The official football home of AWUJALE BOYZ FC, Ijebu-Ode.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -102,7 +104,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { rel: "icon", href: "/favicon.ico", type: "image/x-icon" },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Sans:wght@400;500;600;700&display=swap",
+      },
     ],
   }),
   shellComponent: RootShell,
@@ -140,8 +145,10 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       {/* Required: nested routes render here. Removing <Outlet /> breaks all child routes. */}
-      <ClubShell><Outlet /></ClubShell>
-      <Toaster richColors position="top-right"/>
+      <ClubShell>
+        <Outlet />
+      </ClubShell>
+      <Toaster richColors position="top-right" />
     </QueryClientProvider>
   );
 }
